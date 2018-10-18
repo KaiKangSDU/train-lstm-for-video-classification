@@ -19,11 +19,13 @@ class VGG_Net(nn.Module):
     def forward(self, x):
         x = self.pre_model(x)
         # x = self.dropout(x)
-        x = self.classifier(x)
+
+        #存储特征不需要最后一个分类层，最后的结果是 4096维的
+        #x = self.classifier(x)
 
         return x
 if __name__ == '__main__':
-    
+
     data_transforms = {'train': transforms.Compose([
             transforms.RandomResizedCrop(224),
             transforms.RandomHorizontalFlip(),
@@ -60,10 +62,7 @@ if __name__ == '__main__':
 
     dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 
-    for data in dataloaders['train']:
-        inputs, labels, path = data
-        print(inputs.shape, labels, path)
-        inputs, labels = Variable(inputs), Variable(labels)
+
 
 
 
@@ -74,7 +73,19 @@ if __name__ == '__main__':
     else:
         model = VGG_Net(model_emotion)
 
-    model.load_state_dict(torch.load("best_vggface.pkl", map_location='cpu'))
+    # 提取特征的网络
+    model_dic =  nn.Sequential(*list(model.children())[:-1])
+    print(model_dic)
 
+    #model.load_state_dict(torch.load("best_vggface.pkl", map_location='cpu'))
+    #print(model)
+
+    '''
+    for phase in ['train','val']:
+        for data in dataloaders[phase]:
+            inputs, labels, path = data
+
+            inputs, labels = Variable(inputs), Variable(labels)
+    '''
 
 
