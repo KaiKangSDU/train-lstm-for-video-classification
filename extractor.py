@@ -1,7 +1,10 @@
 import torch.nn as nn
 import torch
-from VGG_Face_torch import VGG_Face_torch\
-
+from VGG_Face_torch import VGG_Face_torch
+from load_image import customData
+from torchvision import transforms
+from torch.autograd import Variable
+import os
 
 
 #搭建了vgg face 模型
@@ -16,27 +19,62 @@ class VGG_Net(nn.Module):
     def forward(self, x):
         x = self.pre_model(x)
         # x = self.dropout(x)
-
         x = self.classifier(x)
 
         return x
+if __name__ == '__main__':
+    
+    data_transforms = {'train': transforms.Compose([
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+            'val': transforms.Compose([
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+        }
 
-model_emotion = VGG_Face_torch
-model = VGG_Net(model_emotion)
-if torch.cuda.is_available():
-    model = VGG_Net(model_emotion).cuda()
-else:
+
+    data_path = "G:\kk_file\EmotiW\AFEW_IMAGE_align_crop\Data" #................................................是要改的
+    use_gpu = torch.cuda.is_available()
+    batch_size = 32
+    num_class = 7
+
+        #convert image into List
+    image_datasets = {x: customData(img_path=os.path.join(data_path,x),
+                                        txt_path=os.path.join(data_path,x)+'\content.txt',
+                                        data_transforms=data_transforms,
+                                       dataset=x) for x in ['train', 'val']}
+
+
+
+
+        #convert to tensor, 作为模型可以接受的数据，就定义好是不是打乱， 每个batch_size是多少
+    dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x],
+                                     batch_size=1,
+                                     shuffle=True,
+                                     num_workers=4)
+                       for x in ['train', 'val']}
+
+    dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
+
+    for data in dataloaders['train']:
+        inputs, labels, path = data
+        print(inputs.shape, labels, path)
+        inputs, labels = Variable(inputs), Variable(labels)
+
+
+
+    model_emotion = VGG_Face_torch
     model = VGG_Net(model_emotion)
+    if torch.cuda.is_available():
+        model = VGG_Net(model_emotion).cuda()
+    else:
+        model = VGG_Net(model_emotion)
 
-
-
-model.load_state_dict(torch.load("best_vggface.pkl",map_location='cpu'))
-
-
-
-
-
-
+    model.load_state_dict(torch.load("best_vggface.pkl", map_location='cpu'))
 
 
 
