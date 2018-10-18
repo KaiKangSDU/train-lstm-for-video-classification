@@ -12,7 +12,7 @@ import os
 class VGG_Net(nn.Module):
     def __init__(self, model):
         super(VGG_Net, self).__init__()
-        self.pre_model = nn.Sequential(*list(model.children())[:-1])  #删除最后一层
+        self.pre_model = nn.Sequential(*list(model.children())[:-2])  #删除最后一层
         # self.dropout = nn.Dropout(p=0.8)
         #self.classifier = nn.Linear(4096, 7)
 
@@ -73,19 +73,16 @@ if __name__ == '__main__':
     else:
         model = VGG_Net(model_emotion)
 
+    #print(model)
+
+
     #预训练模型的参数
     pretrained_dict = torch.load("best_vggface.pkl", map_location='cpu')
 
-
-    print(model)
-   
-
-    #feature model parameter
-    #model_dict = model.state_dict()
-    #print(model_dict)
-    #pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
-   # model_dict.updata(pretrained_dict)
-    #model.load_state_dict(pretrained_dict)
+    model_dict = model.state_dict()
+    pretrained_dict = { k: v for k,v in pretrained_dict.items() if k in model_dict}
+    model_dict.update(pretrained_dict)
+    model.load_state_dict(pretrained_dict)
 
 
 
