@@ -26,7 +26,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epoches, use_gpu, da
         print('Epoch {}/{}'.format(epoch, num_epoches-1))
         print('-'*10)
 
-        for phase in ['train','val']:
+        for phase in ['train']:
             if phase == 'train':
                 scheduler.step()    #这个是啥
                 model.train(True)  #训练模式
