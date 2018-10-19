@@ -1,5 +1,6 @@
 
 '''
+file is modified by 
 https://github.com/miraclewkf/ImageClassification-PyTorch/blob/master/level2/train_customData.py
 the prosess of the training
 训练的整个过程。
