@@ -5,8 +5,6 @@ from load_image import customData
 from torchvision import transforms
 from torch.autograd import Variable
 import os
-import json
-import pickle
 import numpy, scipy.io
 
 
