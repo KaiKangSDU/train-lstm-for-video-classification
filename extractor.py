@@ -11,6 +11,21 @@ import numpy, scipy.io
 
 
 #搭建了vgg face 模型
+'''
+采用vggface预训练模型，提取face的特征，保存为mat文件，为之后的LSTM的输入做准备
+
+load mat file
+
+import scipy.io as scio
+file = r'G:\kk_file\EmotiW\AFEW_IMAGE_align_crop_feature\Data\Disgust\010942127\031.mat'
+data = scio.loadmat(file)
+data['feature']
+print(data['feature'].shape)
+
+'''
+
+
+
 
 class VGG_Net(nn.Module):
     def __init__(self, model):
@@ -64,8 +79,6 @@ if __name__ == '__main__':
     dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
 
 
-
-
     # feature model
     model_emotion = VGG_Face_torch
     model = VGG_Net(model_emotion)
@@ -93,7 +106,8 @@ if __name__ == '__main__':
             out = model(inputs)
 
             feature_map = out.detach().numpy()       #convert variable into numpy
-            print(feature_map.shape)
+            #print(feature_map.shape)
+            #................................................................construct save path.    changable
             filename = str(path).split('\\')[-1].split('.')[0] + '.mat'
             videoname = str(path).split('\\')[-3]
             labelname = str(path).split('\\')[-5]
